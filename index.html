@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoT App Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+/* Top App Bar */
+.header {
+    background: #1e293b;
+    padding: 15px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+/* Container */
+.container {
+    padding: 15px;
+}
+
+/* Card Style */
+.card {
+    background: linear-gradient(145deg, #1e293b, #334155);
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+/* Title */
+.title {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+/* Value */
+.value {
+    font-size: 28px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* Status */
+.status {
+    margin-top: 10px;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+/* Status Colors */
+.dry {
+    background: #dc2626;
+}
+
+.wet {
+    background: #16a34a;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    🌱 Smart Farming App
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <div class="title">🌡 Temperature</div>
+        <div class="value" id="temp">--</div>
+    </div>
+
+    <div class="card">
+        <div class="title">💧 Humidity</div>
+        <div class="value" id="hum">--</div>
+    </div>
+
+    <div class="card">
+        <div class="title">🌿 Soil Moisture</div>
+        <div class="value" id="soil">--</div>
+        <div id="soilStatus" class="status">--</div>
+    </div>
+
+</div>
+
+<div class="footer">
+    Live IoT Monitoring System
+</div>
+
+<script>
+const picoIP = "http://10.157.112.47:8080"; // 🔁 your IP
+
+async function fetchData() {
+    try {
+        const response = await fetch(picoIP);
+        const data = await response.json();
+
+        document.getElementById("temp").innerText = data.temperature + " °C";
+        document.getElementById("hum").innerText = data.humidity + " %";
+        document.getElementById("soil").innerText = data.soil;
+
+        // Soil condition logic
+        let status = document.getElementById("soilStatus");
+
+        if (data.soil < 30000) {
+            status.innerText = "🌵 Dry";
+            status.className = "status dry";
+        } else {
+            status.innerText = "🌿 Wet";
+            status.className = "status wet";
+        }
+
+    } catch (error) {
+        console.log("Error:", error);
+    }
+}
+
+// Auto update every 3 sec
+setInterval(fetchData, 3000);
+fetchData();
+</script>
+
+</body>
+</html>
